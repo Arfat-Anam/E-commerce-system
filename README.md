@@ -1,4 +1,3 @@
-# E-commerce-system
 class Product:
     def __init__(self, name, price, stock):
         self.name = name
@@ -11,16 +10,12 @@ class Product:
             return True
         return False
 
-class Customer:
-    def __init__(self, name):
-        self.name = name
-        self.cart = ShoppingCart()
+    def __hash__(self):
+        return hash((self.name, self.price))
 
-    def add_to_cart(self, product, quantity):
-        return self.cart.add_product(product, quantity)
+    def __eq__(self, other):
+        return isinstance(other, Product) and self.name == other.name and self.price == other.price
 
-    def remove_from_cart(self, product):
-        return self.cart.remove_product(product)
 
 class ShoppingCart:
     def __init__(self):
@@ -40,7 +35,21 @@ class ShoppingCart:
         return False
 
     def apply_discount(self, percentage):
-        return sum(product.price * qty * (1 - percentage / 100) for product, qty in self.items.items())
+        return sum(product.price * qty * (1 - percentage / 100)
+                   for product, qty in self.items.items())
+
+
+class Customer:
+    def __init__(self, name):
+        self.name = name
+        self.cart = ShoppingCart()
+
+    def add_to_cart(self, product, quantity):
+        return self.cart.add_product(product, quantity)
+
+    def remove_from_cart(self, product):
+        return self.cart.remove_product(product)
+
 
 class Order:
     def __init__(self, customer):
@@ -50,6 +59,7 @@ class Order:
     def process_order(self):
         self.customer.cart.items.clear()
         return f"Order processed for {self.customer.name}. Total: ${self.total_price:.2f}"
+
 
 # Example usage
 product1 = Product("Laptop", 1000, 5)
@@ -61,3 +71,4 @@ customer.add_to_cart(product2, 2)
 
 order = Order(customer)
 print(order.process_order())
+
